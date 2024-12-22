@@ -174,3 +174,4 @@ cython_debug/
 .streamlit/*
 .streamlit/secrets.toml
 .json
+*.json
