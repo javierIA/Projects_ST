@@ -16,12 +16,15 @@ import numpy as np
 warnings.filterwarnings('ignore', 'Unverified HTTPS request')
 
 class COCOExportAnalyzer:
-    def __init__(self):
-        self.base_url = "https://teleflexcvat.ia.center"
+    def __init__(self,base_url: str):
+        
         user = st.secrets["username"]
         password = st.secrets["password"]
-        credentials = credentials = f"{user}:{password}"
+        credentials = f"{user}:{password}"
         basic_auth = base64.b64encode(credentials.encode()).decode()
+ 
+
+
         self.headers = {
             'Authorization': f'Basic {basic_auth}',
             'accept': 'application/vnd.cvat+json'
@@ -247,7 +250,7 @@ def display_statistics(stats: dict):
         csv,
         "analisis_anotaciones.csv",
         "text/csv",
-        key='download-csv'
+        key=f'download-csv-{datetime.now().timestamp()}'
     )
 
 def main():
@@ -259,14 +262,20 @@ def main():
     
     st.title("📊 Análisis de Anotaciones CVAT")
     st.markdown("---")
-    
+    server_options = {
+        "Teleflex CVAT": "https://teleflexcvat.ia.center",
+        "CVAT Azure Centralus": "https://cvat.centralus.cloudapp.azure.com"
+    }
+    selected_server_name = st.selectbox("Selecciona el Servidor de CVAT", list(server_options.keys()))
+    selected_base_url = server_options[selected_server_name]
     project_id = st.text_input("ID del Proyecto", help="Ingrese el ID numérico del proyecto")
     
     if st.button("🔍 Analizar Proyecto"):
         if project_id and project_id.isdigit():
-            analyzer = COCOExportAnalyzer()
+            analyzer = COCOExportAnalyzer(base_url=selected_base_url)
             
-            with st.spinner('Procesando proyecto...'):
+            with st.spinner('🔄 Descargando y analizando las anotaciones del proyecto...'):
+
                 annotations_file = analyzer.export_project(int(project_id))
                 
                 if annotations_file:
