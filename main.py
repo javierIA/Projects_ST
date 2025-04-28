@@ -16,8 +16,8 @@ import numpy as np
 warnings.filterwarnings('ignore', 'Unverified HTTPS request')
 
 class COCOExportAnalyzer:
-    def __init__(self,base_url: str):
-        
+    def __init__(self,base_url: str = "https://teleflexcvat.ia.center"):
+        self.base_url = base_url.rstrip('/')
         user = st.secrets["username"]
         password = st.secrets["password"]
         credentials = f"{user}:{password}"
@@ -271,8 +271,9 @@ def main():
     project_id = st.text_input("ID del Proyecto", help="Ingrese el ID numérico del proyecto")
     
     if st.button("🔍 Analizar Proyecto"):
-        if project_id and project_id.isdigit():
+        if selected_base_url and project_id and str(project_id).isdigit():
             analyzer = COCOExportAnalyzer(base_url=selected_base_url)
+
             
             with st.spinner('🔄 Descargando y analizando las anotaciones del proyecto...'):
 
